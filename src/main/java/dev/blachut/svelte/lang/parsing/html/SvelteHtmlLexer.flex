@@ -147,6 +147,7 @@ CONDITIONAL_COMMENT_CONDITION=({ALPHA})({ALPHA}|{WHITE_SPACE_CHARS}|{DIGIT}|"."|
 }
 
 <YYINITIAL> "{" { yybeginNestable(SVELTE_INTERPOLATION_START); return SvelteTokenTypes.START_MUSTACHE; }
+<YYINITIAL> "}" { return SvelteTokenTypes.END_MUSTACHE; }
 
 <SVELTE_INTERPOLATION_START> {
   {WHITE_SPACE}      { return TokenType.WHITE_SPACE; }
@@ -241,6 +242,6 @@ CONDITIONAL_COMMENT_CONDITION=({ALPHA})({ALPHA}|{WHITE_SPACE_CHARS}|{DIGIT}|"."|
 "&#"[xX]({DIGIT}|[a-fA-F])+";" { return XmlTokenType.XML_CHAR_ENTITY_REF; }
 "&"{TAG_NAME}";" { return XmlTokenType.XML_ENTITY_REF_TOKEN; }
 
-<YYINITIAL> ([^<{&\$# \n\r\t\f]|(\\\$)|(\\#))* { return XmlTokenType.XML_DATA_CHARACTERS; }
+<YYINITIAL> ([^<{}&\$# \n\r\t\f]|(\\\$)|(\\#))* { return XmlTokenType.XML_DATA_CHARACTERS; }
 <YYINITIAL> [^] { return XmlTokenType.XML_DATA_CHARACTERS; }
 [^] { return XmlTokenType.XML_BAD_CHARACTER; }

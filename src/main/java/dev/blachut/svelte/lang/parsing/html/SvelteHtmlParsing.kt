@@ -46,20 +46,33 @@ class SvelteHtmlParsing(builder: PsiBuilder) : HtmlParsing(builder) {
     }
 
     override fun hasCustomTagContent(): Boolean {
-        return isRemappedStartMustache()
+        return isRemappedStartMustache() || isStandaloneEndMustache()
     }
 
     override fun parseCustomTagContent(xmlText: PsiBuilder.Marker?): PsiBuilder.Marker? {
+        if (isStandaloneEndMustache()) {
+            // Behave as close as when parsing XmlTokenType.XML_DATA_CHARACTERS
+            builder.advanceLexer()
+            return xmlText
+        }
+
         terminateText(xmlText)
         svelteParsing.parseSvelteTag(tagLevel())
         return null
     }
 
     override fun hasCustomTopLevelContent(): Boolean {
-        return hasCustomTagContent()
+        return isRemappedStartMustache() || isStandaloneEndMustache()
     }
 
     override fun parseCustomTopLevelContent(error: PsiBuilder.Marker?): PsiBuilder.Marker? {
+        if (isStandaloneEndMustache()) {
+            // Behave as close as when parsing XmlTokenType.XML_DATA_CHARACTERS
+            val flushedError = flushError(error)
+            builder.advanceLexer()
+            return flushedError
+        }
+
         flushError(error)
         svelteParsing.parseSvelteTag(tagLevel())
 
@@ -156,7 +169,11 @@ class SvelteHtmlParsing(builder: PsiBuilder) : HtmlParsing(builder) {
     }
 
     private fun isRemappedStartMustache(): Boolean {
-        return token() === XmlTokenType.XML_NAME && builder.originalText[builder.currentOffset] == '{'
+        return builder.tokenType === XmlTokenType.XML_NAME && builder.originalText[builder.currentOffset] == '{'
+    }
+
+    private fun isStandaloneEndMustache(): Boolean {
+        return builder.tokenType === SvelteTokenTypes.END_MUSTACHE
     }
 
     private fun parseAttributeExpression(elementType: IElementType) {
