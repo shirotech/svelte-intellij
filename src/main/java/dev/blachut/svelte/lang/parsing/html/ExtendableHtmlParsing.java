@@ -167,9 +167,8 @@ public class ExtendableHtmlParsing extends HtmlParsing {
 
                 String tagName = StringUtil.toLowerCase(originalTagName);
                 while (childTerminatesParentInStack(tagName)) {
-                    IElementType tagElementType = getHtmlTagElementType();
                     PsiBuilder.Marker top = closeTag();
-                    top.doneBefore(tagElementType, tag);
+                    top.doneBefore(getHtmlTagElementType(), tag);
                 }
 
                 myTagMarkersStack.push(tag);
@@ -328,13 +327,17 @@ public class ExtendableHtmlParsing extends HtmlParsing {
         final String tagName = myTagNamesStack.peek();
         closeTag();
 
+        terminateParentTag(tag, tagName);
+    }
+
+    // TODO Rename method to better reflect what parent means in this context
+    protected void terminateParentTag(@NotNull PsiBuilder.Marker tag, @NotNull String tagName) {
         final String parentTagName = hasTags() ? myTagNamesStack.peek() : "";
         boolean isInlineTagContainer = HtmlUtil.isInlineTagContainerL(parentTagName);
         boolean isOptionalTagEnd = HtmlUtil.isOptionalEndForHtmlTagL(parentTagName);
         if (isInlineTagContainer && HtmlUtil.isHtmlBlockTagL(tagName) && isOptionalTagEnd && !HtmlUtil.isPossiblyInlineTag(tagName)) {
-            IElementType tagElementType = getHtmlTagElementType();
             PsiBuilder.Marker top = closeTag();
-            top.doneBefore(tagElementType, tag);
+            top.doneBefore(getHtmlTagElementType(), tag);
         }
     }
 
@@ -367,33 +370,45 @@ public class ExtendableHtmlParsing extends HtmlParsing {
     }
 
     private boolean childTerminatesParentInStack(final String childName) {
-        boolean isCell = TD_TAG.equals(childName) || TH_TAG.equals(childName);
-        boolean isRow = TR_TAG.equals(childName);
-        boolean isStructure = isStructure(childName);
-
         for (int i = myTagNamesStack.size() - 1; i >= 0; i--) {
             String parentName = myTagNamesStack.get(i);
-            final boolean isParentTable = TABLE_TAG.equals(parentName);
-            final boolean isParentStructure = isStructure(parentName);
-            if (isCell && (TR_TAG.equals(parentName) || isParentStructure || isParentTable) ||
-                isRow && (isParentStructure || isParentTable) ||
-                isStructure && isParentTable) {
-                return false;
-            }
 
-            if ("li".equals(childName) && ("ul".equals(parentName) || "ol".equals(parentName))) {
-                return false;
-            }
-
-            if ("dl".equals(parentName) && ("dd".equals(childName) || "dt".equals(childName))) {
-                return false;
-            }
-
-            if (HtmlUtil.canTerminate(childName, parentName)) {
-                return true;
+            Boolean result = childTerminatesParent(childName, parentName, i + 1);
+            if (result != null) {
+                return result;
             }
         }
         return false;
+    }
+
+    @Nullable
+    protected Boolean childTerminatesParent(final String childName, final String parentName, int tagLevel) {
+        final boolean isCell = TD_TAG.equals(childName) || TH_TAG.equals(childName);
+        final boolean isRow = TR_TAG.equals(childName);
+        final boolean isStructure = isStructure(childName);
+
+        final boolean isParentTable = TABLE_TAG.equals(parentName);
+        final boolean isParentStructure = isStructure(parentName);
+
+        if (isCell && (TR_TAG.equals(parentName) || isParentStructure || isParentTable) ||
+            isRow && (isParentStructure || isParentTable) ||
+            isStructure && isParentTable) {
+            return false;
+        }
+
+        if ("li".equals(childName) && ("ul".equals(parentName) || "ol".equals(parentName))) {
+            return false;
+        }
+
+        if ("dl".equals(parentName) && ("dd".equals(childName) || "dt".equals(childName))) {
+            return false;
+        }
+
+        if (HtmlUtil.canTerminate(childName, parentName)) {
+            return true;
+        }
+
+        return null;
     }
 
     private static boolean isStructure(String childName) {
