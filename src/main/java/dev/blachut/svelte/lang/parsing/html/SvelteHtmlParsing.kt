@@ -2,7 +2,6 @@ package dev.blachut.svelte.lang.parsing.html
 
 import com.intellij.codeInsight.daemon.XmlErrorMessages
 import com.intellij.lang.PsiBuilder
-import com.intellij.lang.html.HtmlParsing
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.xml.XmlElementType
 import com.intellij.psi.xml.XmlTokenType
@@ -18,8 +17,11 @@ import dev.blachut.svelte.lang.psi.*
  * Remapping also ensures that lexer and other token-based components do not care about HtmlParsing limitations.
  *
  * After checking if XmlTokenType.XML_NAME is in fact '{' token is remapped back to SvelteTokenTypes.START_MUSTACHE.
+ *
+ * TODO Replace XmlErrorMessages after dropping support for 2019.3
  */
-class SvelteHtmlParsing(builder: PsiBuilder) : HtmlParsing(builder) {
+@Suppress("UnstableApiUsage", "DEPRECATION")
+class SvelteHtmlParsing(builder: PsiBuilder) : ExtendableHtmlParsing(builder) {
     init {
         builder.setTokenTypeRemapper { source, _, _, _ ->
             return@setTokenTypeRemapper if (source === SvelteTokenTypes.START_MUSTACHE) XmlTokenType.XML_NAME else source
@@ -83,6 +85,22 @@ class SvelteHtmlParsing(builder: PsiBuilder) : HtmlParsing(builder) {
         }
 
         return null
+    }
+
+    override fun childTerminatesParent(childName: String?, parentName: String?, tagLevel: Int): Boolean? {
+        if (tagLevel <= svelteParsing.blockLevel) {
+            return false
+        }
+
+        return super.childTerminatesParent(childName, parentName, tagLevel)
+    }
+
+    override fun terminateParentTag(tag: PsiBuilder.Marker, tagName: String) {
+        if (tagLevel() <= svelteParsing.blockLevel) {
+            return
+        }
+
+        super.terminateParentTag(tag, tagName)
     }
 
     private fun flushHtmlTags(beforeMarker: PsiBuilder.Marker, targetTagLevel: Int) {

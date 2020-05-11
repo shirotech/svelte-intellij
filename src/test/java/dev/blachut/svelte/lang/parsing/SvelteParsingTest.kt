@@ -48,6 +48,10 @@ class SvelteParsingTest : ParsingTestCase(
     fun testNestedBlocks() = doTest()
     fun testWhitespace() = doTest()
 
+    fun testHtmlAutoClosingTags() = doTest()
+    fun testHtmlAutoClosingTagsAcrossBlock() = doTest()
+    fun testHtmlAutoClosingTagsInsideBlock() = doTest()
+
     fun testHtmlMissingEndTags() = doTest()
     fun testHtmlSpecialTags() = doTest()
     // await catch
