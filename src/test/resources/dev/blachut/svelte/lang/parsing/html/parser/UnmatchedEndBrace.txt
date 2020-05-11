@@ -1,0 +1,75 @@
+SvelteHtmlFile: UnmatchedEndBrace.svelte
+  PsiElement(HTML_DOCUMENT)
+    PsiElement(XML_PROLOG)
+      <empty list>
+    XmlToken:XML_DATA_CHARACTERS('root')
+    SvelteJS: CONTENT_EXPRESSION
+      PsiElement(JS:LBRACE)('{')
+      PsiErrorElement:expression expected
+        <empty list>
+      PsiElement(JS:RBRACE)('}')
+    PsiElement(END_MUSTACHE)('}')
+    XmlToken:XML_DATA_CHARACTERS('text')
+    PsiElement(END_MUSTACHE)('}')
+    XmlToken:XML_DATA_CHARACTERS('text')
+    PsiWhiteSpace('\n')
+    SvelteHtmlTag: div
+      XmlToken:XML_START_TAG_START('<')
+      XmlToken:XML_NAME('div')
+      PsiWhiteSpace(' ')
+      SvelteHtmlAttribute: }
+        XmlToken:XML_NAME('}')
+      PsiWhiteSpace(' ')
+      SvelteHtmlAttribute: title
+        XmlToken:XML_NAME('title')
+        XmlToken:XML_EQ('=')
+        PsiElement(XML_ATTRIBUTE_VALUE)
+          XmlToken:XML_ATTRIBUTE_VALUE_TOKEN('}')
+      PsiWhiteSpace(' ')
+      SvelteHtmlAttribute: class
+        XmlToken:XML_NAME('class')
+        XmlToken:XML_EQ('=')
+        PsiElement(XML_ATTRIBUTE_VALUE)
+          XmlToken:XML_ATTRIBUTE_VALUE_TOKEN('prefix}suffix')
+      PsiWhiteSpace(' ')
+      SvelteHtmlAttribute: tabindex
+        XmlToken:XML_NAME('tabindex')
+        XmlToken:XML_EQ('=')
+        PsiElement(XML_ATTRIBUTE_VALUE)
+          XmlToken:XML_ATTRIBUTE_VALUE_START_DELIMITER('"')
+          XmlToken:XML_ATTRIBUTE_VALUE_TOKEN('}')
+          XmlToken:XML_ATTRIBUTE_VALUE_END_DELIMITER('"')
+      XmlToken:XML_TAG_END('>')
+      XmlText
+        XmlToken:XML_DATA_CHARACTERS('content')
+      SvelteJS: CONTENT_EXPRESSION
+        PsiElement(JS:LBRACE)('{')
+        PsiErrorElement:expression expected
+          <empty list>
+        PsiElement(JS:RBRACE)('}')
+      PsiElement(END_MUSTACHE)('}')
+      XmlText
+        XmlToken:XML_DATA_CHARACTERS('text')
+        PsiElement(END_MUSTACHE)('}')
+        XmlToken:XML_DATA_CHARACTERS('text')
+      XmlToken:XML_END_TAG_START('</')
+      XmlToken:XML_NAME('div')
+      XmlToken:XML_TAG_END('>')
+    PsiWhiteSpace('\n')
+    SvelteIfBlock
+      SvelteIfPrimaryBranch
+        SvelteInitialTag(IF_START)
+          PsiElement(JS:LBRACE)('{')
+          PsiElement(JS:SHARP)('#')
+          PsiElement(JS:IF_KEYWORD)('if')
+          PsiWhiteSpace(' ')
+          JS:LITERAL_EXPRESSION
+            PsiElement(JS:TRUE_KEYWORD)('true')
+          PsiElement(JS:RBRACE)('}')
+        SvelteFragment
+          PsiElement(END_MUSTACHE)('}')
+      SvelteEndTag(IF_END)
+        PsiElement(JS:LBRACE)('{')
+        PsiElement(JS:DIV)('/')
+        PsiElement(JS:IF_KEYWORD)('if')
+        PsiElement(JS:RBRACE)('}')

@@ -32,6 +32,13 @@ class SvelteHtmlParserTest : ParsingTestCase(
         registerExtensionPoint(EmbeddedTokenTypesProvider.EXTENSION_POINT_NAME, EmbeddedTokenTypesProvider::class.java)
     }
 
+    fun testAttributeQuoted() = doTest()
+    fun testAttributeShorthand() = doTest()
+    fun testAttributeSpread() = doTest()
+    fun testAttributeUnquoted() = doTest()
+
+    //  TODO Support await...catch blocks
+    fun testBlockAwaitCatch() = doTest()
     fun testBlockAwaitThenThenThen() = doTest()
     fun testBlockEachAmbiguousAs() = doTest()
     fun testBlockEachAsAsAsAs() = doTest()
@@ -49,7 +56,10 @@ class SvelteHtmlParserTest : ParsingTestCase(
 
     fun testHtmlMissingEndTags() = doTest()
     fun testHtmlSpecialTags() = doTest()
-    // await catch
+
+    fun testLet() = doTest()
+
+    fun testUnmatchedEndBrace() = doTest()
 
     private fun doTest() = doTest(true)
 }
